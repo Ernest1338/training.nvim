@@ -7,8 +7,6 @@ local game_n = 1
 local num_of_games = 10
 local timer = 0
 
--- TODO: explain games in the second line
-
 local games = {
     "- hjkl",
     "- relative",
@@ -32,7 +30,10 @@ function M.countdown(buf)
 end
 
 function M.hjkl(buf)
-    local buf_content = { "hjkl game " .. game_n .. "/" .. num_of_games }
+    local buf_content = {
+        "HJKL game [" .. game_n .. "/" .. num_of_games .. "]",
+        "Use the 'hjkl' keys to move the cursor on the X character, them press `x` to delete it"
+    }
     local banner_len = #buf_content
     local playground_size = 20
     for _ = 1, playground_size do
@@ -54,15 +55,18 @@ function M.hjkl(buf)
 end
 
 function M.relative(buf)
-    local buf_content = { "relative game " .. game_n .. "/" .. num_of_games }
+    local buf_content = {
+        "Relative game [" .. game_n .. "/" .. num_of_games .. "]",
+        "Use the <number>j/k to move to the 'DELETE ME' line and press 'VD' to delete it"
+    }
     local banner_len = #buf_content
     local playground_size = 20
     for _ = 1, playground_size do
         table.insert(buf_content, string.rep(" ", playground_size))
     end
     api.nvim_buf_set_lines(buf, 0, -1, false, buf_content)
-    local cursor_row = math.random(banner_len, playground_size)
-    local relative_row = math.random(banner_len, playground_size)
+    local cursor_row = math.random(banner_len + 1, playground_size)
+    local relative_row = math.random(banner_len + 1, playground_size)
     while relative_row + 1 == cursor_row do
         relative_row = math.random(1, playground_size)
     end
@@ -74,7 +78,11 @@ end
 local wam_expected_cursor_state = {}
 
 function M.whack_a_mole(buf)
-    local buf_content = { "whack a mole game " .. game_n .. "/" .. num_of_games, "" }
+    local buf_content = {
+        "Whack A Mole game [" .. game_n .. "/" .. num_of_games .. "]",
+        "Move in whatever way is best for you, to the place marked by the `^` character and delete it by pressing `x`",
+        ""
+    }
 
     local texts = {
         "api.nvim_buf_set_text(buf, relative_row, 0, relative_row, 0, { \"DELETE ME\" })",
@@ -94,28 +102,32 @@ function M.whack_a_mole(buf)
     end
     table.insert(buf_content, string.rep(" ", random_index - 1) .. "^")
 
-    wam_expected_cursor_state = { 3, random_index - 1, string.sub(random_text, random_index, random_index) }
+    wam_expected_cursor_state = { 4, random_index - 1, string.sub(random_text, random_index, random_index) }
 
     api.nvim_buf_set_lines(buf, 0, -1, false, buf_content)
-    api.nvim_win_set_cursor(0, { 3, 0 })
+    api.nvim_win_set_cursor(0, { 4, 0 })
     game_n = game_n + 1
 end
 
 function M.change_text(buf)
-    local buf_content = { "change text game " .. game_n .. "/" .. num_of_games }
+    local buf_content = {
+        "Change Text game [" .. game_n .. "/" .. num_of_games .. "]",
+        "Move to and replace the `CHANGE` string using `ciw` as fast as you can"
+    }
     local banner_len = #buf_content
     local playground_size = 20
     for _ = 1, playground_size do
         table.insert(buf_content, string.rep(" ", playground_size))
     end
     api.nvim_buf_set_lines(buf, 0, -1, false, buf_content)
-    local cursor_row = math.random(banner_len, playground_size)
-    local relative_row = math.random(banner_len, playground_size)
+    local cursor_row = math.random(banner_len + 1, playground_size)
+    local relative_row = math.random(banner_len + 1, playground_size)
     while relative_row + 1 == cursor_row do
         relative_row = math.random(1, playground_size)
     end
     api.nvim_win_set_cursor(0, { cursor_row, 0 })
 
+    -- TODO: more texts
     local texts = {
         "let variable: u32 = CHANGE;",
         "let variable: CHANGE = 420;"
